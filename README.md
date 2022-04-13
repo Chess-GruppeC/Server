@@ -32,7 +32,5 @@ The ``Board`` class will hold state:
 - ``turn`` assigned to party that won dice roll
 - ``moves`` empty
 - ``energy`` set to 0 for both parties
-- ``illegal`` set to false
 - ...
 
----
