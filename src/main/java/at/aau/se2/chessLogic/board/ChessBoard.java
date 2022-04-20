@@ -16,6 +16,29 @@ public class ChessBoard {
         addKings();
     }
 
+    public Location getLocationOf(ChessPiece piece){
+        for(int i=0; i<gameBoard.length; i++){
+            for(int j=0; j< gameBoard[i].length; j++){
+                if(gameBoard[i][j]==piece){
+                    return new Location(i, j);
+                }
+            }
+        }
+        return null;
+    }
+
+    public ChessPiece getPieceAtLocation(Location location){
+        return gameBoard[location.getRow()][location.getColumn()];
+    }
+
+    public boolean isWithinBounds(int row, int column){
+        if((row >= 0) && (row < 8)
+                && (column >= 0) && (column < 8)){
+            return true;
+        }
+        return false;
+    }
+
     public void addPawns(){
         addBlackPawns();
         addWhitePawns();
