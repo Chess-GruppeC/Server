@@ -1,27 +1,28 @@
 package at.aau.se2.chessLogic.board;
 
 public class Move {
-    int row;
-    int column;
 
-    public Move(int row, int column) {
-        this.row = row;
-        this.column = column;
+    Location from;
+    Location to;
+
+    public Move(Location from, Location to) {
+        this.from = from;
+        this.to = to;
     }
 
-    public int getRow() {
-        return row;
+    public Location getFrom() {
+        return from;
     }
 
-    public void setRow(int row) {
-        this.row = row;
+    public void setFrom(Location from) {
+        this.from = from;
     }
 
-    public int getColumn() {
-        return column;
+    public Location getTo() {
+        return to;
     }
 
-    public void setColumn(int column) {
-        this.column = column;
+    public void setTo(Location to) {
+        this.to = to;
     }
 }
