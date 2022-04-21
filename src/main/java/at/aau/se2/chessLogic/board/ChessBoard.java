@@ -2,6 +2,8 @@ package at.aau.se2.chessLogic.board;
 
 import at.aau.se2.chessLogic.pieces.*;
 
+import java.util.ArrayList;
+
 public class ChessBoard {
     ChessPiece[][] gameBoard;
 
@@ -16,6 +18,25 @@ public class ChessBoard {
         addKings();
     }
 
+
+    public void performMoveOnBoard(Move move) throws IllegalArgumentException{
+        if(!isWithinBounds(move.getFrom()) && isWithinBounds(move.getTo())){
+            throw new IllegalArgumentException("Please select a field within bounds");
+        }
+        ArrayList<Location> allLegalMoves = getPieceAtLocation(move.getFrom()).getLegalMoves(this);
+        for(Location location : allLegalMoves){
+            if(move.getTo()==location){
+                setLocationTo(getPieceAtLocation(move.getFrom()), move.getTo());
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Please perform a legal move");
+    }
+
+    public ArrayList<Location> getLegalMovesForPiece(Location location){
+        return getPieceAtLocation(location).getLegalMoves(this);
+    }
+
     public Location getLocationOf(ChessPiece piece){
         for(int i=0; i<gameBoard.length; i++){
             for(int j=0; j< gameBoard[i].length; j++){
@@ -27,6 +48,12 @@ public class ChessBoard {
         return null;
     }
 
+    public void setLocationTo(ChessPiece piece, Location targetLocation){
+        Location originLocation = this.getLocationOf(piece);
+        gameBoard[targetLocation.getRow()][targetLocation.getColumn()]=piece;
+        gameBoard[originLocation.getRow()][originLocation.getColumn()]=null;
+    }
+
     public ChessPiece getPieceAtLocation(Location location){
         return gameBoard[location.getRow()][location.getColumn()];
     }
@@ -34,6 +61,14 @@ public class ChessBoard {
     public boolean isWithinBounds(int row, int column){
         if((row >= 0) && (row < 8)
                 && (column >= 0) && (column < 8)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isWithinBounds(Location location){
+        if((location.getRow() >= 0) && (location.getRow() < 8)
+                && (location.getColumn() >= 0) && (location.getColumn() < 8)){
             return true;
         }
         return false;
