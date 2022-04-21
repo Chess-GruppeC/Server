@@ -25,4 +25,13 @@ public class Move {
     public void setTo(Location to) {
         this.to = to;
     }
+
+    public boolean compareMoves(Move move){
+        if (this.getFrom()==move.getFrom()
+            && this.getTo()==move.getTo()){
+            return true;
+        }
+        return false;
+    }
+
 }
