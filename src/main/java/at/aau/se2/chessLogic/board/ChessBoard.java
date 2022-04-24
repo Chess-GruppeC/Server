@@ -18,6 +18,13 @@ public class ChessBoard {
         addKings();
     }
 
+    public ChessPiece[][] getGameBoard() {
+        return gameBoard;
+    }
+
+    public void setGameBoard(ChessPiece[][] gameBoard) {
+        this.gameBoard = gameBoard;
+    }
 
     public void performMoveOnBoard(Move move) throws IllegalArgumentException{
         if(!isWithinBounds(move.getFrom()) && isWithinBounds(move.getTo())){
@@ -177,7 +184,7 @@ public class ChessBoard {
 
     public void addWhiteKing(){
         King whiteKing = new King (PieceColour.WHITE);
-        gameBoard[7][3]=whiteKing;
+        gameBoard[7][4]=whiteKing;
     }
 
 }
