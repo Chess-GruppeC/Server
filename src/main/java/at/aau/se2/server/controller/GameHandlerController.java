@@ -41,12 +41,12 @@ public class GameHandlerController {
      */
     @MessageMapping("/join")
     @SendToUser(broadcast = false)
-    public Integer joinGame(@Payload String gameId, @Header("simpUser") Player player) {
+    public String joinGame(@Payload String gameId, @Header("simpUser") Player player) {
         Integer code = gameHandlerService.joinGame(player, gameId);
         if(code == Game.JOINING_SUCCESSFUL){
             // Send the data of the successfully joined player to the players waiting in lobby
             simpMessagingTemplate.convertAndSend("/topic/update/" + gameId, player);
         }
-        return code; // Send to the caller
+        return code.toString(); // Send to the caller
     }
 }

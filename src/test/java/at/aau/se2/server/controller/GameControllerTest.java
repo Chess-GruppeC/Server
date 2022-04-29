@@ -1,0 +1,50 @@
+package at.aau.se2.server.controller;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.messaging.simp.stomp.*;
+
+import java.lang.reflect.Type;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class GameControllerTest extends AbstractControllerTest {
+
+    @Test
+    public void verifyGameDataIsReceived() throws Exception {
+        assertTrue(session.isConnected());
+        blockingQueue = new ArrayBlockingQueue<>(1);
+
+        session.subscribe("/topic/update/1", new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return String.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                System.out.println("Received message: " + payload);
+                blockingQueue.add((String) payload);
+            }
+        });
+
+        // This subscription should not receive the game data as it has a wrong game ID
+        session.subscribe("/topic/update/2", new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return String.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                fail();
+            }
+        });
+
+        session.send("/topic/game/1", "Data");
+        assertEquals("Data", blockingQueue.poll(1, TimeUnit.SECONDS));
+    }
+}

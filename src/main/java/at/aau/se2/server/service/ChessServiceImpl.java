@@ -8,6 +8,6 @@ public class ChessServiceImpl implements ChessService<String> {
     @Override
     public String onUpdate(String payload, String gameKey) {
         // work with the incoming data...
-        return "GAME UPDATE"; // send updated data to all players
+        return payload; // send the data to all players
     }
 }

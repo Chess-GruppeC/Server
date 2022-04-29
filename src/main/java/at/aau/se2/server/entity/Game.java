@@ -20,7 +20,7 @@ public class Game {
 
     // 62 different characters to the power of 5 = 916 * 10^6 different IDs
     // Should be unique enough for our game
-    private static final int ID_SIZE = 5;
+    public static final int ID_SIZE = 5;
 
     public Game() {
         players = new ArrayList<>();
@@ -29,6 +29,10 @@ public class Game {
 
     public void setRandomID() {
         ID = generateID(ID_SIZE);
+    }
+
+    public void setId(String id) {
+        ID = id;
     }
 
     public String generateID(Integer size) {
