@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameControllerTest extends AbstractControllerTest {
 
+    private String gameId;
+
     @Test
     public void verifyGameDataIsReceived() throws Exception {
-        assertTrue(session.isConnected());
-        blockingQueue = new ArrayBlockingQueue<>(1);
 
         session.subscribe("/topic/update/1", new StompFrameHandler() {
 
@@ -46,5 +46,48 @@ class GameControllerTest extends AbstractControllerTest {
 
         session.send("/topic/game/1", "Data");
         assertEquals("Data", blockingQueue.poll(1, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void getOpponentTest() throws InterruptedException {
+        assertTrue(session.isConnected());
+
+        session.subscribe("/user/queue/create", new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return String.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                gameId = (String) payload;
+                session.send(getHeaders("/topic/game/opponent"), gameId);
+            }
+        });
+
+        session.subscribe("/user/queue/game/opponent", new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return String.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((String) payload);
+            }
+        });
+
+        session.send(getHeaders("/topic/create"), "");
+        // Should receive a response.
+        assertNotNull(blockingQueue.poll(1, TimeUnit.SECONDS));
+    }
+
+    private StompHeaders getHeaders(String destination) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.add("simpUser", "Player");
+        stompHeaders.setDestination(destination);
+        return stompHeaders;
     }
 }

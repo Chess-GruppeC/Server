@@ -6,4 +6,5 @@ public interface GameHandlerService {
     String createNewGame(Player creator);
     Integer joinGame(Player player, String gameId);
     void endGame(String gameId);
+    String getOpponent(Player requestingPlayer, String gameId);
 }

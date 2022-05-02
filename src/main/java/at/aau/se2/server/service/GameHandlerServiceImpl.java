@@ -6,6 +6,10 @@ import at.aau.se2.server.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 @Service
 public class GameHandlerServiceImpl implements GameHandlerService {
 
@@ -32,6 +36,19 @@ public class GameHandlerServiceImpl implements GameHandlerService {
     @Override
     public void endGame(String gameId) {
         gameRepository.remove(gameId);
+    }
+
+    @Override
+    public String getOpponent(Player requestingPlayer, String gameId) {
+        Optional<Player> opponent = gameRepository.findById(gameId)
+                .getPlayers()
+                .stream()
+                .filter(Predicate.not(player -> Objects.equals(player, requestingPlayer))).findFirst();
+        if(opponent.isPresent()) {
+            System.out.println(opponent.get().getName());
+            return opponent.get().getName();
+        }
+        return "-1";
     }
 
 }
