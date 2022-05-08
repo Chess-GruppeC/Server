@@ -22,15 +22,13 @@ class AbstractControllerTest {
     @LocalServerPort
     protected Integer port;
 
-    protected WebSocketStompClient webSocketStompClient;
-
     protected StompSession session;
 
     protected BlockingQueue<String> blockingQueue;
 
     @BeforeEach
     public void setup() throws Exception {
-        this.webSocketStompClient = new WebSocketStompClient(new SockJsClient(
+        WebSocketStompClient webSocketStompClient = new WebSocketStompClient(new SockJsClient(
                 List.of(new WebSocketTransport(new StandardWebSocketClient()))));
 
         webSocketStompClient.setMessageConverter(new StringMessageConverter());
@@ -44,7 +42,7 @@ class AbstractControllerTest {
 
     }
 
-    private String getWsPath() {
+    protected String getWsPath() {
         return String.format("ws://localhost:%d/chess", port);
     }
 

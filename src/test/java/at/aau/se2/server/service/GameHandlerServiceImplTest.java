@@ -1,7 +1,9 @@
 package at.aau.se2.server.service;
 
+import at.aau.se2.server.dto.PlayerDTO;
 import at.aau.se2.server.entity.Game;
 import at.aau.se2.server.entity.Player;
+import at.aau.se2.server.mapper.PlayerMapper;
 import at.aau.se2.server.repository.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,9 @@ class GameHandlerServiceImplTest {
 
     @Mock
     private GameRepository gameRepository;
+
+    @Mock
+    private PlayerMapper playerMapper;
 
     private Player player1, player2;
 
@@ -70,17 +75,23 @@ class GameHandlerServiceImplTest {
     @Test
     public void getOpponentCorrectTest() {
         when(gameRepository.findById(game.getID())).thenReturn(game);
+        PlayerDTO player1DTO = new PlayerDTO(player1.getName());
+        PlayerDTO player2DTO = new PlayerDTO(player2.getName());
+        when(playerMapper.map(player1)).thenReturn(player1DTO);
+        when(playerMapper.map(player2)).thenReturn(player2DTO);
         service.joinGame(player1, game.getID());
         service.joinGame(player2, game.getID());
-        assertEquals(player2.getName(), service.getOpponent(player1, game.getID()));
-        assertEquals(player1.getName(), service.getOpponent(player2, game.getID()));
+        assertEquals(player2DTO, service.getOpponent(player1, game.getID()));
+        assertEquals(player1DTO, service.getOpponent(player2, game.getID()));
     }
 
     @Test
     public void getOpponentFailTest() {
         when(gameRepository.findById(game.getID())).thenReturn(game);
         service.joinGame(player1, game.getID());
-        assertEquals("-1", service.getOpponent(player1, game.getID()));
+        PlayerDTO opponent = service.getOpponent(player1, game.getID());
+        assertNotNull(opponent);
+        assertNull(opponent.getName());
     }
 
 }

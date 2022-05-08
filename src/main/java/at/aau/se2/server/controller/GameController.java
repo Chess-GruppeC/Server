@@ -1,5 +1,6 @@
 package at.aau.se2.server.controller;
 
+import at.aau.se2.server.dto.PlayerDTO;
 import at.aau.se2.server.entity.Player;
 import at.aau.se2.server.service.ChessService;
 import at.aau.se2.server.service.GameHandlerService;
@@ -32,7 +33,7 @@ public class GameController {
 
     @MessageMapping("/game/opponent")
     @SendToUser(broadcast = false)
-    public String getOpponent(@Payload String gameId, @Header("simpUser") Player requestingPlayer) {
+    public PlayerDTO getOpponent(@Payload String gameId, @Header("simpUser") Player requestingPlayer) {
         return gameHandlerService.getOpponent(requestingPlayer, gameId);
     }
 
