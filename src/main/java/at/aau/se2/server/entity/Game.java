@@ -18,9 +18,12 @@ public class Game {
     public static final int GAME_FULL = 0;
     public static final int JOINING_SUCCESSFUL = 1;
 
-    // 62 different characters to the power of 5 = 916 * 10^6 different IDs
+    // 58 different characters to the power of 5 = 656 * 10^6 different IDs
     // Should be unique enough for our game
     public static final int ID_SIZE = 5;
+
+    // Base58 characters for human readability
+    public static final char[] ID_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
 
     public Game() {
         players = new ArrayList<>();
@@ -36,7 +39,7 @@ public class Game {
     }
 
     public String generateID(Integer size) {
-        return RandomStringUtils.randomAlphanumeric(size);
+        return RandomStringUtils.random(ID_SIZE, ID_CHARACTERS);
     }
 
     public String getID() {
@@ -50,13 +53,13 @@ public class Game {
     public boolean join(Player p) {
         Optional<String> usernames = players.stream().map(Player::getName)
                 .filter(name -> name.equals(p.getName())).findFirst();
-        if(usernames.isPresent()) {
+        if (usernames.isPresent()) {
             // player reconnected with new session id
             return true;
         }
 
         // check if the player can join
-        if(players.size() < PLAYERS_REQUIRED) {
+        if (players.size() < PLAYERS_REQUIRED) {
             players.add(p);
             return true;
         }

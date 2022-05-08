@@ -3,6 +3,8 @@ package at.aau.se2.server.entity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
@@ -21,7 +23,9 @@ class GameTest {
     @Test
     public void generateRandomIdTest() {
         String randomId = g1.generateID(5);
-        assertEquals(5, randomId.length());
+        String regex = "[" + Arrays.toString(Game.ID_CHARACTERS) + "]{" + Game.ID_SIZE + "}";
+        assertEquals(Game.ID_SIZE, randomId.length());
+        assertTrue(randomId.matches(regex));
     }
 
     @Test
