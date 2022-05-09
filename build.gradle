@@ -3,6 +3,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id "org.sonarqube" version "3.3"
+	id 'jacoco'
 }
 
 group = 'at.aau.se2'
@@ -12,6 +13,13 @@ sourceCompatibility = '11'
 repositories {
 	mavenCentral()
 }
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+test.finalizedBy jacocoTestReport
 
 sonarqube {
 	properties {
