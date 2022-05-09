@@ -1,7 +1,13 @@
 package at.aau.se2.server.controller;
 
 import at.aau.se2.server.dto.PlayerDTO;
+import at.aau.se2.server.entity.Game;
+import at.aau.se2.server.entity.Player;
+import at.aau.se2.server.repository.GameRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -17,7 +23,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameControllerTest extends AbstractControllerTest {
 
-    private String gameId;
+    @Autowired
+    private GameRepository repository;
+
+    @Autowired
+    private GameController gameController;
+
+    private Game game;
+    private Player player;
+
+    @BeforeEach
+    public void init() {
+        game = new Game();
+        player = new Player("player");
+        player.setSessionId("1");
+        game.join(player);
+        repository.add(game);
+    }
 
     @Test
     public void verifyGameDataIsReceived() throws Exception {
@@ -88,9 +110,45 @@ class GameControllerTest extends AbstractControllerTest {
         assertNotNull(queue.poll(1, TimeUnit.SECONDS));
     }
 
+    @Test()
+    @Disabled // until proper test implemented
+    public void sendDiceValueTest() throws InterruptedException, ExecutionException, TimeoutException {
+
+        BlockingQueue<Object> queue = new ArrayBlockingQueue<>(1);
+
+        WebSocketStompClient webSocketStompClientJSON = new WebSocketStompClient(new SockJsClient(
+                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+
+        webSocketStompClientJSON.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSession sessionJSON = webSocketStompClientJSON
+                .connect(String.format(getWsPath(), port), new StompSessionHandlerAdapter() {
+                })
+                .get(1, TimeUnit.SECONDS);
+
+        assertTrue(sessionJSON.isConnected());
+
+        sessionJSON.subscribe("/topic/getStartingPlayer/" + game.getID(), new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return Object.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                queue.add(payload);
+            }
+
+        });
+
+        sessionJSON.send(getHeaders("/topic/game/rollDice/" + game.getID()), "1");
+    }
+
     private StompHeaders getHeaders(String destination) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.add("simpUser", "Player");
+        stompHeaders.setSession(player.getSessionId());
+        stompHeaders.add("simpUser", player.getName());
         stompHeaders.setDestination(destination);
         return stompHeaders;
     }

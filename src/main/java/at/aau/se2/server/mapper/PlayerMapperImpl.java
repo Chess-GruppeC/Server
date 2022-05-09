@@ -9,6 +9,6 @@ public class PlayerMapperImpl implements PlayerMapper {
 
     @Override
     public PlayerDTO map(Player player) {
-        return new PlayerDTO(player.getName());
+        return new PlayerDTO(player.getName(), player.getDiceValue());
     }
 }

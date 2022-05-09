@@ -2,18 +2,19 @@ package at.aau.se2.server.entity;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Game {
 
     private String ID;
-    private final List<Player> players;
+    private List<Player> players;
+    private Player diceRollWinner;
+
+    private boolean hasEqualDiceValues = false;
 
     public static final int PLAYERS_REQUIRED = 2;
 
-    // constants
+    // status codes
     public static final int GAME_NOT_FOUND = -1;
     public static final int GAME_FULL = 0;
     public static final int JOINING_SUCCESSFUL = 1;
@@ -51,19 +52,63 @@ public class Game {
     }
 
     public boolean join(Player p) {
-        Optional<String> usernames = players.stream().map(Player::getName)
+        Optional<String> username = players.stream().map(Player::getName)
                 .filter(name -> name.equals(p.getName())).findFirst();
-        if (usernames.isPresent()) {
+        if (username.isPresent()) {
             // player reconnected with new session id
             return true;
         }
 
         // check if the player can join
         if (players.size() < PLAYERS_REQUIRED) {
+            System.out.println("Player with session " + p.getSessionId() + " joined");
             players.add(p);
             return true;
         }
+        System.out.println("Player with session " + p.getSessionId() + " rejected");
+
         return false;
     }
 
+    public void addDice(Player player, Integer value) {
+        players.stream()
+                .filter(p -> p.getName().equals(player.getName()) && p.getSessionId().equals(player.getSessionId()))
+                .findFirst().get().setDiceValue(value);
+
+        int amountOfDiceValues = (int) players.stream().map(Player::getDiceValue)
+                .filter(Objects::nonNull).count();
+
+        if(amountOfDiceValues == PLAYERS_REQUIRED) {
+            if(allDiceValuesEqual()) {
+                resetDiceValues();
+            } else {
+                diceRollWinner = players.stream().max(Comparator.comparing(Player::getDiceValue)).get();
+                hasEqualDiceValues = false;
+            }
+        }
+    }
+
+    public void resetDiceValues() {
+        players.forEach(Player::resetDiceValue);
+        diceRollWinner = null;
+        hasEqualDiceValues = true;
+    }
+
+    private boolean allDiceValuesEqual() {
+        return players.stream()
+                .map(Player::getDiceValue)
+                .distinct().count() == 1;
+    }
+
+    public boolean hasEqualDiceValues() {
+        return hasEqualDiceValues;
+    }
+
+    public boolean hasDiceRollWinner() {
+        return diceRollWinner != null;
+    }
+
+    public Player getDiceRollWinner() {
+        return diceRollWinner;
+    }
 }
