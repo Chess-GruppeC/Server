@@ -6,8 +6,8 @@ import java.util.*;
 
 public class Game {
 
-    private String ID;
-    private List<Player> players;
+    private String id;
+    private final List<Player> players;
     private Player diceRollWinner;
 
     private boolean hasEqualDiceValues = false;
@@ -24,7 +24,7 @@ public class Game {
     public static final int ID_SIZE = 5;
 
     // Base58 characters for human readability
-    public static final char[] ID_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
+    protected static final char[] ID_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
 
     public Game() {
         players = new ArrayList<>();
@@ -32,19 +32,19 @@ public class Game {
     }
 
     public void setRandomID() {
-        ID = generateID(ID_SIZE);
+        id = generateID(ID_SIZE);
     }
 
     public void setId(String id) {
-        ID = id;
+        this.id = id;
     }
 
     public String generateID(Integer size) {
-        return RandomStringUtils.random(ID_SIZE, ID_CHARACTERS);
+        return RandomStringUtils.random(size, ID_CHARACTERS);
     }
 
-    public String getID() {
-        return ID;
+    public String getId() {
+        return id;
     }
 
     public List<Player> getPlayers() {
@@ -61,11 +61,9 @@ public class Game {
 
         // check if the player can join
         if (players.size() < PLAYERS_REQUIRED) {
-            System.out.println("Player with session " + p.getSessionId() + " joined");
             players.add(p);
             return true;
         }
-        System.out.println("Player with session " + p.getSessionId() + " rejected");
 
         return false;
     }
@@ -73,16 +71,19 @@ public class Game {
     public void addDice(Player player, Integer value) {
         players.stream()
                 .filter(p -> p.getName().equals(player.getName()) && p.getSessionId().equals(player.getSessionId()))
-                .findFirst().get().setDiceValue(value);
+                .findFirst()
+                .ifPresent(p -> p.setDiceValue(value));
 
         int amountOfDiceValues = (int) players.stream().map(Player::getDiceValue)
                 .filter(Objects::nonNull).count();
 
-        if(amountOfDiceValues == PLAYERS_REQUIRED) {
-            if(allDiceValuesEqual()) {
+        if (amountOfDiceValues == PLAYERS_REQUIRED) {
+            if (allDiceValuesEqual()) {
                 resetDiceValues();
             } else {
-                diceRollWinner = players.stream().max(Comparator.comparing(Player::getDiceValue)).get();
+                players.stream()
+                        .max(Comparator.comparing(Player::getDiceValue))
+                        .ifPresent(p -> diceRollWinner = p);
                 hasEqualDiceValues = false;
             }
         }

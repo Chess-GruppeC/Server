@@ -1,6 +1,5 @@
 package at.aau.se2.server.controller;
 
-import at.aau.se2.server.dto.PlayerDTO;
 import at.aau.se2.server.entity.Game;
 import at.aau.se2.server.entity.Player;
 import at.aau.se2.server.repository.GameRepository;
@@ -42,7 +41,7 @@ class GameControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void verifyGameDataIsReceived() throws Exception {
+    void verifyGameDataIsReceived() throws Exception {
 
         session.subscribe("/topic/update/1", new StompFrameHandler() {
 
@@ -76,7 +75,7 @@ class GameControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void getOpponentTest() throws InterruptedException, ExecutionException, TimeoutException {
+    void getOpponentTest() throws InterruptedException, ExecutionException, TimeoutException {
         BlockingQueue<Object> queue = new ArrayBlockingQueue<>(1);
 
         WebSocketStompClient webSocketStompClientJSON = new WebSocketStompClient(new SockJsClient(
@@ -111,8 +110,8 @@ class GameControllerTest extends AbstractControllerTest {
     }
 
     @Test()
-    @Disabled // until proper test implemented
-    public void sendDiceValueTest() throws InterruptedException, ExecutionException, TimeoutException {
+    @Disabled("Lacks proper test implementation")
+    void sendDiceValueTest() throws InterruptedException, ExecutionException, TimeoutException {
 
         BlockingQueue<Object> queue = new ArrayBlockingQueue<>(1);
 
@@ -128,7 +127,7 @@ class GameControllerTest extends AbstractControllerTest {
 
         assertTrue(sessionJSON.isConnected());
 
-        sessionJSON.subscribe("/topic/getStartingPlayer/" + game.getID(), new StompFrameHandler() {
+        sessionJSON.subscribe("/topic/getStartingPlayer/" + game.getId(), new StompFrameHandler() {
 
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -142,7 +141,7 @@ class GameControllerTest extends AbstractControllerTest {
 
         });
 
-        sessionJSON.send(getHeaders("/topic/game/rollDice/" + game.getID()), "1");
+        sessionJSON.send(getHeaders("/topic/game/rollDice/" + game.getId()), "1");
     }
 
     private StompHeaders getHeaders(String destination) {

@@ -15,7 +15,7 @@ class ChessServiceImplTest {
     }
 
     @Test
-    public void gameUpdateTest() {
+    void gameUpdateTest() {
         assertEquals("data", service.onUpdate("data", "id"));
     }
 

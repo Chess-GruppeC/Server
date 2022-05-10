@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DiceResultDTOTest {
 
     @Test
-    public void jsonConversionTestShouldNotContainsKey() throws JsonProcessingException {
+    void jsonConversionTestShouldNotContainsKey() throws JsonProcessingException {
         PlayerDTO p1 = new PlayerDTO("player1");
         PlayerDTO p2 = new PlayerDTO("player2");
         DiceResultDTO result = new DiceResultDTO(List.of(p1, p2));
@@ -23,7 +23,7 @@ class DiceResultDTOTest {
     }
 
     @Test
-    public void jsonConversionTestContainsKey() throws JsonProcessingException {
+    void jsonConversionTestContainsKey() throws JsonProcessingException {
         PlayerDTO p1 = new PlayerDTO("player1");
         PlayerDTO p2 = new PlayerDTO("player2");
         DiceResultDTO result = new DiceResultDTO(List.of(p1, p2), p1);

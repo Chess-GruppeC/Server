@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameHandlerControllerTest extends AbstractControllerTest {
 
     @Test
-    public void createGameTest() throws Exception {
+    void createGameTest() throws Exception {
         assertTrue(session.isConnected());
         session.subscribe("/user/queue/create", new StompFrameHandler() {
 
@@ -23,7 +23,6 @@ class GameHandlerControllerTest extends AbstractControllerTest {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                System.out.println("Received message: " + payload);
                 blockingQueue.add((String) payload);
             }
         });
@@ -34,7 +33,7 @@ class GameHandlerControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void joinGameFailTest() throws Exception {
+    void joinGameFailTest() throws Exception {
         assertTrue(session.isConnected());
 
         session.subscribe("/user/queue/join", new StompFrameHandler() {
@@ -46,7 +45,6 @@ class GameHandlerControllerTest extends AbstractControllerTest {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                System.out.println("Received message: " + payload);
                 blockingQueue.add((String) payload);
             }
         });
@@ -57,7 +55,7 @@ class GameHandlerControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void joinGameSuccessfulTest() throws Exception {
+    void joinGameSuccessfulTest() throws Exception {
         assertTrue(session.isConnected());
 
         session.subscribe("/user/queue/create", new StompFrameHandler() {
@@ -82,7 +80,6 @@ class GameHandlerControllerTest extends AbstractControllerTest {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                System.out.println("Received message: " + payload);
                 blockingQueue.add((String) payload);
             }
         });

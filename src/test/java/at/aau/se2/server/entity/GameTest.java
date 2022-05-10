@@ -24,7 +24,7 @@ class GameTest {
     }
 
     @Test
-    public void generateRandomIdTest() {
+    void generateRandomIdTest() {
         String randomId = g1.generateID(5);
         String regex = "[" + Arrays.toString(Game.ID_CHARACTERS) + "]{" + Game.ID_SIZE + "}";
         assertEquals(Game.ID_SIZE, randomId.length());
@@ -32,32 +32,32 @@ class GameTest {
     }
 
     @Test
-    public void setRandomIdTest() {
-        String temp = g1.getID();
+    void setRandomIdTest() {
+        String temp = g1.getId();
         g1.setRandomID();
-        assertNotEquals(temp, g1.getID());
+        assertNotEquals(temp, g1.getId());
     }
 
     @Test
-    public void setIdTest() {
+    void setIdTest() {
         g1.setId("1");
-        assertEquals("1", g1.getID());
+        assertEquals("1", g1.getId());
     }
 
     @Test
-    public void getPlayersTest() {
+    void getPlayersTest() {
         assertNotNull(g1.getPlayers());
     }
 
     @Test
-    public void joinGameSuccessfulTest() {
+    void joinGameSuccessfulTest() {
         assertTrue(g1.join(p1));
         assertTrue(g1.join(p2));
         assertEquals(2, g1.getPlayers().size());
     }
 
     @Test
-    public void joinFullGameTest() {
+    void joinFullGameTest() {
         assertTrue(g1.join(p1));
         assertTrue(g1.join(p2));
         assertFalse(g1.join(p3));
@@ -65,7 +65,7 @@ class GameTest {
     }
 
     @Test
-    public void rejoinGameTest() {
+    void rejoinGameTest() {
         assertTrue(g1.join(p1));
         assertTrue(g1.join(p2));
         assertTrue(g1.join(p1));
@@ -73,14 +73,14 @@ class GameTest {
     }
 
     @Test
-    public void addDiceTooFewValuesTest() {
+    void addDiceTooFewValuesTest() {
         g1.join(p1);
         g1.addDice(p1, 4);
         assertFalse(g1.hasDiceRollWinner());
     }
 
     @Test
-    public void addDiceOnePlayerTwiceTest() {
+    void addDiceOnePlayerTwiceTest() {
         g1.join(p1);
         g1.addDice(p1, 4);
         g1.addDice(p1, 6);
@@ -88,7 +88,7 @@ class GameTest {
     }
 
     @Test
-    public void addDiceTest() {
+    void addDiceTest() {
         g1.join(p1);
         g1.join(p2);
         g1.addDice(p1, 4);
@@ -101,7 +101,7 @@ class GameTest {
     }
 
     @Test
-    public void addDiceEqualValuesTest() {
+    void addDiceEqualValuesTest() {
         g1.join(p1);
         g1.join(p2);
         g1.addDice(p1, 4);
@@ -110,7 +110,7 @@ class GameTest {
     }
 
     @Test
-    public void reRollAfterEqualDiceValuesTest() {
+    void reRollAfterEqualDiceValuesTest() {
         g1.join(p1);
         g1.join(p2);
         g1.addDice(p1, 4);
@@ -123,7 +123,7 @@ class GameTest {
     }
 
     @Test
-    public void resetDiceTest() {
+    void resetDiceTest() {
         g1.join(p1);
         g1.addDice(p1, 4);
         assertNotNull(p1.getDiceValue());

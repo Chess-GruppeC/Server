@@ -29,7 +29,7 @@ public class GameHandlerServiceImpl implements GameHandlerService {
         Game game = new Game();
         game.join(creator);
         gameRepository.add(game);
-        return game.getID();
+        return game.getId();
     }
 
     @Override
@@ -68,7 +68,6 @@ public class GameHandlerServiceImpl implements GameHandlerService {
                 Player winner = game.getDiceRollWinner();
                 PlayerDTO winnerDTO  = playerMapper.map(winner);
                 PlayerDTO otherPlayerDTO  = playerMapper.map(getOpponentOf(winner, gameId));
-                System.out.println("Winner");
                 return new DiceResultDTO(List.of(winnerDTO, otherPlayerDTO), winnerDTO);
             } else if(game.hasEqualDiceValues()) {
                 List<PlayerDTO> playerDTOS = game.getPlayers()

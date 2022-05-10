@@ -21,11 +21,11 @@ public class GameRepositoryImpl implements GameRepository {
 
     @Override
     public Game add(Game g) {
-        if (games.containsKey(g.getID())) {
+        if (games.containsKey(g.getId())) {
             // Shouldn't happen
             g.setRandomID();  // try another random ID
         }
-        return games.put(g.getID(), g);
+        return games.put(g.getId(), g);
     }
 
     @Override
