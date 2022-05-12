@@ -4,7 +4,8 @@ import java.security.Principal;
 
 public class Player implements Principal {
 
-    private String name;
+    private final String name;
+    private Integer diceValue;
     private String sessionId;
 
     public Player(String name) {
@@ -17,6 +18,20 @@ public class Player implements Principal {
 
     public String getSessionId() {
         return sessionId;
+    }
+
+    public void setDiceValue(Integer value) {
+        if(diceValue == null) {
+            diceValue = value;
+        }
+    }
+
+    public void resetDiceValue() {
+        diceValue = null;
+    }
+
+    public Integer getDiceValue() {
+        return diceValue;
     }
 
     @Override

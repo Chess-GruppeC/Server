@@ -21,38 +21,38 @@ class GameRepositoryImplTest {
     }
 
     @Test
-    public void insertTest() {
+    void insertTest() {
         gameRepository.add(g1);
         assertEquals(1, gameRepository.size());
     }
 
     @Test
-    public void insertGameWithDuplicateID() {
+    void insertGameWithDuplicateID() {
         gameRepository.add(g1);
-        g2.setId(g1.getID());
+        g2.setId(g1.getId());
         gameRepository.add(g2);
-        assertNotEquals(g1.getID(), g2.getID());
+        assertNotEquals(g1.getId(), g2.getId());
         assertEquals(2, gameRepository.size());
     }
 
     @Test
-    public void removeTest() {
+    void removeTest() {
         gameRepository.add(g1);
-        gameRepository.remove(g1.getID());
+        gameRepository.remove(g1.getId());
         assertEquals(0, gameRepository.size());
     }
 
     @Test
-    public void findByIdTest() {
+    void findByIdTest() {
         gameRepository.add(g1);
-        assertEquals(g1, gameRepository.findById(g1.getID()));
+        assertEquals(g1, gameRepository.findById(g1.getId()));
     }
 
     @Test
-    public void findAllTest() {
+    void findAllTest() {
         gameRepository.add(g1);
         gameRepository.add(g2);
-        assertEquals(Map.of(g1.getID(), g1, g2.getID(), g2), gameRepository.findAll());
+        assertEquals(Map.of(g1.getId(), g1, g2.getId(), g2), gameRepository.findAll());
     }
 
 }

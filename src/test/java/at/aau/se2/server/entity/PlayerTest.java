@@ -16,7 +16,7 @@ class PlayerTest {
     }
 
     @Test
-    public void setSessionId() {
+    void setSessionId() {
         p1.setSessionId("1");
         assertEquals("1", p1.getSessionId());
     }

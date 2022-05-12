@@ -1,6 +1,5 @@
 package at.aau.se2.server.controller;
 
-import at.aau.se2.server.entity.Game;
 import at.aau.se2.server.entity.Player;
 import at.aau.se2.server.service.GameHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +42,6 @@ public class GameHandlerController {
     @SendToUser(broadcast = false)
     public String joinGame(@Payload String gameId, @Header("simpUser") Player player) {
         Integer code = gameHandlerService.joinGame(player, gameId);
-        if(code == Game.JOINING_SUCCESSFUL){
-            // Send the data of the successfully joined player to the players waiting in lobby
-            simpMessagingTemplate.convertAndSend("/topic/update/" + gameId, player);
-        }
         return code.toString(); // Send to the caller
     }
 }
