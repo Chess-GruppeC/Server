@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ChessServiceImplTest {
 
-    private ChessService<String> service;
+    private GameUpdateService service;
 
     @BeforeEach
     public void init() {
-        service = new ChessServiceImpl();
+        service = new GameUpdateServiceImpl();
     }
 
     @Test

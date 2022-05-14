@@ -3,7 +3,7 @@ package at.aau.se2.server.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChessServiceImpl implements ChessService<String> {
+public class GameUpdateServiceImpl implements GameUpdateService {
 
     @Override
     public String onUpdate(String payload, String gameKey) {

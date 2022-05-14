@@ -3,6 +3,7 @@ package at.aau.se2.server.entity;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Game {
 
@@ -66,6 +67,13 @@ public class Game {
         }
 
         return false;
+    }
+
+    public Player getOpponentOf(Player requestingPlayer) {
+        Optional<Player> opponent = players
+                .stream()
+                .filter(Predicate.not(player -> Objects.equals(player, requestingPlayer))).findFirst();
+        return opponent.orElseGet(() -> new Player(null));
     }
 
     public void addDice(Player player, Integer value) {

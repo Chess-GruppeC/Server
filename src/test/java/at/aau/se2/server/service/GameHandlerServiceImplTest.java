@@ -86,15 +86,23 @@ class GameHandlerServiceImplTest {
         when(playerMapper.map(player2)).thenReturn(player2DTO);
         service.joinGame(player1, game.getId());
         service.joinGame(player2, game.getId());
-        assertEquals(player2DTO, playerMapper.map(service.getOpponentOf(player1, game.getId())));
-        assertEquals(player1DTO, playerMapper.map(service.getOpponentOf(player2, game.getId())));
+        assertEquals(player2DTO, service.getOpponentOf(player1, game.getId()));
+        assertEquals(player1DTO, service.getOpponentOf(player2, game.getId()));
     }
 
     @Test
     void getOpponentFailTest() {
         when(gameRepository.findById(game.getId())).thenReturn(game);
+        when(playerMapper.map(any(Player.class))).thenReturn(new PlayerDTO(null));
         service.joinGame(player1, game.getId());
-        Player opponent = service.getOpponentOf(player1, game.getId());
+        PlayerDTO opponent = service.getOpponentOf(player1, game.getId());
+        assertNotNull(opponent);
+        assertNull(opponent.getName());
+    }
+
+    @Test
+    void getOpponentGameNotFoundTest() {
+        PlayerDTO opponent = service.getOpponentOf(player1, game.getId());
         assertNotNull(opponent);
         assertNull(opponent.getName());
     }

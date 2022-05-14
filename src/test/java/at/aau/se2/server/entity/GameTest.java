@@ -73,6 +73,22 @@ class GameTest {
     }
 
     @Test
+    void getOpponentCorrectTest() {
+        g1.join(p1);
+        g1.join(p2);
+        Player opponent = g1.getOpponentOf(p1);
+        assertEquals(p2, opponent);
+    }
+
+    @Test
+    void getOpponentFailTest() {
+        g1.join(p1);
+        Player opponent = g1.getOpponentOf(p1);
+        assertNotNull(opponent);
+        assertNull(opponent.getName());
+    }
+
+    @Test
     void addDiceTooFewValuesTest() {
         g1.join(p1);
         g1.addDice(p1, 4);

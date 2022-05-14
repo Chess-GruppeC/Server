@@ -4,7 +4,8 @@ import at.aau.se2.server.dto.PlayerDTO;
 import at.aau.se2.server.dto.DiceResultDTO;
 import at.aau.se2.server.entity.Player;
 import at.aau.se2.server.mapper.PlayerMapper;
-import at.aau.se2.server.service.ChessService;
+import at.aau.se2.server.service.GameUpdateService;
+import at.aau.se2.server.service.UpdateService;
 import at.aau.se2.server.service.GameHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Controller;
 public class GameController {
 
     @Autowired
-    private ChessService<String> chessService;
+    private GameUpdateService gameUpdateService;
 
     @Autowired
     private GameHandlerService gameHandlerService;
@@ -28,7 +29,7 @@ public class GameController {
     private PlayerMapper playerMapper;
 
     /**
-     * Passes the incoming data to the {@link ChessService#onUpdate(Object, String)} method to handle and broadcasts the returned value to all players
+     * Passes the incoming data to the {@link UpdateService#onUpdate(Object, String)} method to handle and broadcasts the returned value to all players
      * subscribed to the destination game ID
      *
      * @param gameId the game id
@@ -38,13 +39,13 @@ public class GameController {
     @MessageMapping("/game/{gameId}")
     @SendTo("/topic/update/{gameId}")
     public String gameUpdate(@DestinationVariable String gameId, @Payload String payload) {
-        return chessService.onUpdate(payload, gameId);
+        return gameUpdateService.onUpdate(payload, gameId);
     }
 
     @MessageMapping("/game/opponent")
     @SendToUser(broadcast = false)
     public PlayerDTO getOpponent(@Payload String gameId, @Header("simpUser") Player requestingPlayer) {
-        return playerMapper.map(gameHandlerService.getOpponentOf(requestingPlayer, gameId));
+        return gameHandlerService.getOpponentOf(requestingPlayer, gameId);
     }
 
     @MessageMapping("/game/rollDice/{gameId}")
