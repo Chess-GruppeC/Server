@@ -68,6 +68,7 @@ class GameTest {
     void rejoinGameTest() {
         assertTrue(g1.join(p1));
         assertTrue(g1.join(p2));
+        p1.setSessionId("newSession");
         assertTrue(g1.join(p1));
         assertEquals(2, g1.getPlayers().size());
     }

@@ -3,10 +3,14 @@ package at.aau.se2.server.controller;
 import at.aau.se2.server.entity.Game;
 import at.aau.se2.server.entity.Player;
 import at.aau.se2.server.repository.GameRepository;
+import at.aau.se2.server.repository.GameRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -19,59 +23,42 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class GameControllerTest extends AbstractControllerTest {
+
+    private static final CountDownLatch waiter = new CountDownLatch(1);
 
     @Autowired
     private GameRepository repository;
 
-    @Autowired
-    private GameController gameController;
+    @SpyBean
+    private GameRepository repositorySpy;
 
     private Game game;
-    private Player player;
+    private Player player, player2;
 
     @BeforeEach
     public void init() {
+        MockitoAnnotations.openMocks(this);
         game = new Game();
         player = new Player("player");
-        player.setSessionId("1");
+        player2 = new Player("player2");
         game.join(player);
+        game.join(player2);
+        game.setPlayerOnTurn(player);
         repository.add(game);
     }
 
     @Test
-    void verifyGameDataIsReceived() throws Exception {
+    void verifyGameUpdateControllerIsCalled() throws Exception {
 
-        session.subscribe("/topic/update/1", new StompFrameHandler() {
+        session.send(getHeaders("/topic/game/" + game.getId()), "Data");
+        waiter.await(1, TimeUnit.SECONDS);  // wait one second
 
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return String.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((String) payload);
-            }
-        });
-
-        // This subscription should not receive the game data as it has a wrong game ID
-        session.subscribe("/topic/update/2", new StompFrameHandler() {
-
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return String.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                fail();
-            }
-        });
-
-        session.send("/topic/game/1", "Data");
-        assertEquals("Data", blockingQueue.poll(1, TimeUnit.SECONDS));
+        // Test if the findById() method from the GameRepository is called with the correct game ID
+        // That implicates that the controller method is called correctly
+        verify(repositorySpy).findById(game.getId());
     }
 
     @Test

@@ -10,8 +10,7 @@ public class Game {
     private String id;
     private final List<Player> players;
     private Player diceRollWinner;
-
-    private boolean hasEqualDiceValues = false;
+    private Player playerOnTurn;
 
     public static final int PLAYERS_REQUIRED = 2;
 
@@ -26,6 +25,8 @@ public class Game {
 
     // Base58 characters for human readability
     protected static final char[] ID_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
+
+    private boolean hasEqualDiceValues = false;
 
     public Game() {
         players = new ArrayList<>();
@@ -53,10 +54,12 @@ public class Game {
     }
 
     public boolean join(Player p) {
-        Optional<String> username = players.stream().map(Player::getName)
-                .filter(name -> name.equals(p.getName())).findFirst();
-        if (username.isPresent()) {
+        Optional<Player> player = players.stream()
+                .filter(pl -> pl.getName().equals(p.getName())).findFirst();
+        if (player.isPresent()) {
             // player reconnected with new session id
+            players.remove(player.get());
+            players.add(p);
             return true;
         }
 
@@ -91,9 +94,11 @@ public class Game {
             } else {
                 players.stream()
                         .max(Comparator.comparing(Player::getDiceValue))
-                        .ifPresent(p -> diceRollWinner = p);
+                        .ifPresent(p -> diceRollWinner = playerOnTurn = p);
                 hasEqualDiceValues = false;
             }
+        } else {
+            hasEqualDiceValues = false;
         }
     }
 
@@ -119,5 +124,17 @@ public class Game {
 
     public Player getDiceRollWinner() {
         return diceRollWinner;
+    }
+
+    public Player getPlayerOnTurn() {
+        return playerOnTurn;
+    }
+
+    public void setPlayerOnTurn(Player newPlayerOnTurn) {
+        this.playerOnTurn = newPlayerOnTurn;
+    }
+
+    public void switchPlayerOnTurn() {
+        this.playerOnTurn = getOpponentOf(playerOnTurn);
     }
 }

@@ -1,6 +1,7 @@
 package at.aau.se2.server.service;
 
-public interface UpdateService<T, D> {
-    T onUpdate(D payload, String gameKey);
+import at.aau.se2.server.entity.Player;
 
+public interface UpdateService<D> {
+    void onUpdate(D payload, Player player, String gameId);
 }
