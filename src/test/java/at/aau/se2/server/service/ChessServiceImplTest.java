@@ -34,6 +34,8 @@ class ChessServiceImplTest {
         MockitoAnnotations.openMocks(this);
         p1 = new Player("p1");
         p2 = new Player("p2");
+        p1.setSessionId("1");
+        p2.setSessionId("2");
         game = new Game();
         game.join(p1);
         game.join(p2);
@@ -61,6 +63,34 @@ class ChessServiceImplTest {
         game.switchPlayerOnTurn();
         service.onUpdate("data", p1, game.getId());
         verifyNoInteractions(simpMessagingTemplate);
+    }
+
+    @Test
+    void gameFlowTest() {
+        game.addDice(p1, 5);
+        assertFalse(game.hasDiceRollWinner());
+        game.addDice(p2, 5);
+        assertFalse(game.hasDiceRollWinner());
+
+        game.addDice(p1, 5);
+        game.addDice(p2, 2);
+        assertTrue(game.hasDiceRollWinner());
+        assertEquals(p1, game.getDiceRollWinner());
+        assertEquals(p1, game.getPlayerOnTurn());
+
+        // it is p1's turn
+        service.onUpdate("data", p2, game.getId());
+        verifyNoInteractions(simpMessagingTemplate);
+        service.onUpdate("data", p1, game.getId());
+        verify(simpMessagingTemplate).convertAndSend("/topic/update/" + game.getId(), "data");
+
+        // it is p2's turn now
+        reset(simpMessagingTemplate);
+        assertEquals(p2, game.getPlayerOnTurn());
+        service.onUpdate("data", p1, game.getId());
+        verifyNoInteractions(simpMessagingTemplate);
+        service.onUpdate("data", p2, game.getId());
+        verify(simpMessagingTemplate).convertAndSend("/topic/update/" + game.getId(), "data");
     }
 
 }
