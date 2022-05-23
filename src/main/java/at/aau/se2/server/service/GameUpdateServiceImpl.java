@@ -21,13 +21,14 @@ public class GameUpdateServiceImpl implements GameUpdateService {
     @Override
     public void onUpdate(String payload, Player player, String gameId) {
         Game game = Objects.requireNonNull(gameRepository.findById(gameId));
-
         Player playerOnTurn = game.getPlayerOnTurn();
+
         if(!player.equals(playerOnTurn)) {
             return;
         }
 
-        game.setPlayerOnTurn(game.getOpponentOf(player));
+        game.setGameState(payload);
+        game.switchPlayerOnTurn();
         simpMessagingTemplate.convertAndSend("/topic/update/" + gameId, payload);
     }
 }

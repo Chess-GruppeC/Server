@@ -28,6 +28,8 @@ public class Game {
 
     private boolean hasEqualDiceValues = false;
 
+    private String gameState;
+
     public Game() {
         players = new ArrayList<>();
         setRandomID();
@@ -54,10 +56,14 @@ public class Game {
     }
 
     public boolean join(Player p) {
+        p.resetDiceValue();
         Optional<Player> player = players.stream()
                 .filter(pl -> pl.getName().equals(p.getName())).findFirst();
         if (player.isPresent()) {
             // player reconnected with new session id
+            if (player.get().equals(playerOnTurn)) {
+                playerOnTurn = p;
+            }
             players.remove(player.get());
             players.add(p);
             return true;
@@ -80,6 +86,10 @@ public class Game {
     }
 
     public void addDice(Player player, Integer value) {
+        if (hasDiceRollWinner()) {
+            return;
+        }
+
         players.stream()
                 .filter(p -> p.getName().equals(player.getName()) && p.getSessionId().equals(player.getSessionId()))
                 .findFirst()
@@ -112,6 +122,14 @@ public class Game {
         return players.stream()
                 .map(Player::getDiceValue)
                 .distinct().count() == 1;
+    }
+
+    public String getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(String gameState) {
+        this.gameState = gameState;
     }
 
     public boolean hasEqualDiceValues() {
