@@ -8,21 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ChessServiceImplTest {
+class GameUpdateServiceImplTest {
 
     @InjectMocks
     private GameUpdateService service;
 
     @Mock
     private GameRepository gameRepository;
-
-    @Mock
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     private Player p1, p2;
 
@@ -45,15 +41,13 @@ class ChessServiceImplTest {
     @Test
     void gameUpdatePlayerNotAllowedToMakeMoveTest() {
         game.setPlayerOnTurn(p2);
-        service.onUpdate("data", p1, game.getId());
-        verifyNoInteractions(simpMessagingTemplate);
+        assertNull(service.onUpdate("data", p1, game.getId()));
     }
 
     @Test
     void gameUpdatePlayerAllowedToMakeMoveTest() {
         game.setPlayerOnTurn(p1);
-        service.onUpdate("data", p1, game.getId());
-        verify(simpMessagingTemplate, times(1)).convertAndSend("/topic/update/" + game.getId(), "data");
+        assertEquals("data", service.onUpdate("data", p1, game.getId()));
     }
 
     @Test
@@ -61,8 +55,7 @@ class ChessServiceImplTest {
         game.setPlayerOnTurn(p1);
         assertEquals(p1, game.getPlayerOnTurn());
         game.switchPlayerOnTurn();
-        service.onUpdate("data", p1, game.getId());
-        verifyNoInteractions(simpMessagingTemplate);
+        assertNull(service.onUpdate("data", p1, game.getId()));
     }
 
     @Test
@@ -79,18 +72,24 @@ class ChessServiceImplTest {
         assertEquals(p1, game.getPlayerOnTurn());
 
         // it is p1's turn
-        service.onUpdate("data", p2, game.getId());
-        verifyNoInteractions(simpMessagingTemplate);
-        service.onUpdate("data", p1, game.getId());
-        verify(simpMessagingTemplate).convertAndSend("/topic/update/" + game.getId(), "data");
+        assertNull(service.onUpdate("data", p2, game.getId()));
+        assertEquals("data", service.onUpdate("data", p1,  game.getId()));
 
         // it is p2's turn now
-        reset(simpMessagingTemplate);
         assertEquals(p2, game.getPlayerOnTurn());
-        service.onUpdate("data", p1, game.getId());
-        verifyNoInteractions(simpMessagingTemplate);
-        service.onUpdate("data", p2, game.getId());
-        verify(simpMessagingTemplate).convertAndSend("/topic/update/" + game.getId(), "data");
+        assertNull(service.onUpdate("data", p1, game.getId()));
+        assertEquals("data", service.onUpdate("data", p2,  game.getId()));
+    }
+
+    @Test
+    void getGameStateTest() {
+        game.setGameState("state");
+        assertEquals("state", service.onSubscribed(game.getId(), p1));
+    }
+
+    @Test
+    void getGameStateNoStateTest() {
+        assertNull(service.onSubscribed(game.getId(), p1));
     }
 
 }

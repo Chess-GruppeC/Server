@@ -36,7 +36,7 @@ public class Player implements Principal {
     }
 
     public String getGameSubscribedTo() {
-        return gameSubscribedTo == null ? "" : gameSubscribedTo.replace("/topic/update/", "");
+        return gameSubscribedTo == null ? "" : gameSubscribedTo;
     }
 
     public void setGameSubscribedTo(String gameSubscribedTo) {

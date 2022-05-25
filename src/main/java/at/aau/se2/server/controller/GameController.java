@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -21,12 +22,6 @@ public class GameController {
     @Autowired
     private GameHandlerService gameHandlerService;
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-
-    @Autowired
-    private PlayerMapper playerMapper;
-
     /**
      * Passes the incoming data to the {@link GameUpdateService#onUpdate(Object, Player, String)} method to handle and broadcasts the returned value to all players
      * subscribed to the destination game ID
@@ -36,8 +31,8 @@ public class GameController {
      */
     @MessageMapping("/game/{gameId}")
     @SendTo("/topic/update/{gameId}")
-    public void gameUpdate(@DestinationVariable String gameId, @Header("simpUser") Player player, @Payload String payload) {
-        gameUpdateService.onUpdate(payload, player, gameId);
+    public String gameUpdate(@DestinationVariable String gameId, @Header("simpUser") Player player, @Payload String payload) {
+        return gameUpdateService.onUpdate(payload, player, gameId);
     }
 
     @MessageMapping("/game/opponent")
@@ -47,11 +42,14 @@ public class GameController {
     }
 
     @MessageMapping("/game/rollDice/{gameId}")
-    public void getStartingPlayerByDiceValue(@DestinationVariable String gameId, @Payload Integer diceValue, @Header("simpUser") Player requestingPlayer) {
-        DiceResultDTO result = gameHandlerService.setDiceValueAndCompare(requestingPlayer, gameId, diceValue);
-        if (result != null) {
-            simpMessagingTemplate.convertAndSend("/topic/getStartingPlayer/" + gameId, result);
-        }
+    @SendTo("/topic/getStartingPlayer/{gameId}")
+    public DiceResultDTO getStartingPlayerByDiceValue(@DestinationVariable String gameId, @Payload Integer diceValue, @Header("simpUser") Player requestingPlayer) {
+        return gameHandlerService.setDiceValueAndCompare(requestingPlayer, gameId, diceValue);
+    }
+
+    @SubscribeMapping("/update/{gameId}")
+    public String getGameState(@DestinationVariable String gameId, @Header("simpUser") Player player) {
+        return gameUpdateService.onSubscribed(gameId, player);
     }
 
 }

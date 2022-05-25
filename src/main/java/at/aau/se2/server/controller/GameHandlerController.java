@@ -16,8 +16,6 @@ public class GameHandlerController {
     @Autowired
     private GameHandlerService gameHandlerService;
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     /**
      * Accepts user requests to create a new game

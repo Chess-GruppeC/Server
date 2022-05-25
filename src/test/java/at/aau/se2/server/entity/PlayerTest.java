@@ -24,7 +24,7 @@ class PlayerTest {
     @Test
     void setGameSubscriptionTest() {
         String gameId = "1";
-        p1.setGameSubscribedTo("/topic/update/" + gameId);
+        p1.setGameSubscribedTo(gameId);
         assertEquals("1", p1.getGameSubscribedTo());
     }
 

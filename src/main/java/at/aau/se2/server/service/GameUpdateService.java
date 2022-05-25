@@ -1,4 +1,7 @@
 package at.aau.se2.server.service;
 
-public interface GameUpdateService extends UpdateService<String> {
+import at.aau.se2.server.entity.Player;
+
+public interface GameUpdateService extends UpdateService<String, String> {
+    String onSubscribed(String gameId, Player player);
 }
