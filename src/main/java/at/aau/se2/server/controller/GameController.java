@@ -47,7 +47,7 @@ public class GameController {
         return gameHandlerService.setDiceValueAndCompare(requestingPlayer, gameId, diceValue);
     }
 
-    @SubscribeMapping("/update/{gameId}")
+    @SubscribeMapping("/state/{gameId}")
     public String getGameState(@DestinationVariable String gameId, @Header("simpUser") Player player) {
         return gameUpdateService.onSubscribed(gameId, player);
     }
