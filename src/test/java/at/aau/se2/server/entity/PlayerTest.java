@@ -21,4 +21,16 @@ class PlayerTest {
         assertEquals("1", p1.getSessionId());
     }
 
+    @Test
+    void setGameSubscriptionTest() {
+        String gameId = "1";
+        p1.setGameSubscribedTo("/topic/update/" + gameId);
+        assertEquals("1", p1.getGameSubscribedTo());
+    }
+
+    @Test
+    void getGameSubscriptionNotSubscribedTest() {
+        assertEquals("", p1.getGameSubscribedTo());
+    }
+
 }

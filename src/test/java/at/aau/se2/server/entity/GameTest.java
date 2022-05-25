@@ -74,6 +74,20 @@ class GameTest {
     }
 
     @Test
+    void playerOnTurnReconnectsTest() {
+        assertTrue(g1.join(p1));
+        assertTrue(g1.join(p2));
+        g1.addDice(p1, 4);
+        g1.addDice(p2, 5);
+        assertEquals(p2, g1.getPlayerOnTurn());
+
+        p2.setSessionId("otherId");
+        g1.join(p2);
+        assertEquals(2, g1.getPlayers().size());
+        assertEquals(p2, g1.getPlayerOnTurn());
+    }
+
+    @Test
     void getOpponentCorrectTest() {
         g1.join(p1);
         g1.join(p2);
@@ -146,6 +160,23 @@ class GameTest {
         assertNotNull(p1.getDiceValue());
         g1.resetDiceValues();
         assertNull(p1.getDiceValue());
+    }
+
+    @Test
+    void addDiceButWinnerAlreadyCalculatedTest() {
+        g1.join(p1);
+        g1.addDice(p1, 4);
+        g1.join(p2);
+        g1.addDice(p2, 5);
+        assertEquals(p2, g1.getDiceRollWinner());
+        g1.addDice(p1, 6);
+        assertEquals(p2, g1.getDiceRollWinner());
+    }
+
+    @Test
+    void gameStateTest() {
+        g1.setGameState("gameData");
+        assertEquals("gameData", g1.getGameState());
     }
 
 }
