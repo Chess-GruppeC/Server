@@ -1,7 +1,6 @@
 package at.aau.se2.server.service;
 
-import at.aau.se2.server.entity.Player;
+import at.aau.se2.server.dto.GameDataDTO;
 
-public interface GameUpdateService extends UpdateService<String, String> {
-    String onSubscribed(String gameId, Player player);
+public interface GameUpdateService extends UpdateService<GameDataDTO<?>, GameDataDTO<?>> {
 }

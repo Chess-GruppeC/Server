@@ -1,5 +1,6 @@
 package at.aau.se2.server.entity;
 
+import at.aau.se2.server.dto.GameDataDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -175,8 +176,9 @@ class GameTest {
 
     @Test
     void gameStateTest() {
-        g1.setGameState("gameData");
-        assertEquals("gameData", g1.getGameState());
+        GameDataDTO<?> data = new GameDataDTO();
+        g1.setGameState(data);
+        assertEquals(data, g1.getGameState());
     }
 
 }

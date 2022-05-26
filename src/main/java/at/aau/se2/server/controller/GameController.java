@@ -1,14 +1,14 @@
 package at.aau.se2.server.controller;
 
+import at.aau.se2.server.dto.GameDataDTO;
 import at.aau.se2.server.dto.PlayerDTO;
 import at.aau.se2.server.dto.DiceResultDTO;
 import at.aau.se2.server.entity.Player;
-import at.aau.se2.server.mapper.PlayerMapper;
 import at.aau.se2.server.service.GameUpdateService;
 import at.aau.se2.server.service.GameHandlerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
@@ -31,7 +31,7 @@ public class GameController {
      */
     @MessageMapping("/game/{gameId}")
     @SendTo("/topic/update/{gameId}")
-    public String gameUpdate(@DestinationVariable String gameId, @Header("simpUser") Player player, @Payload String payload) {
+    public GameDataDTO<?> gameUpdate(@DestinationVariable String gameId, @Header("simpUser") Player player, @Payload GameDataDTO<?> payload) throws JsonProcessingException {
         return gameUpdateService.onUpdate(payload, player, gameId);
     }
 
@@ -48,8 +48,8 @@ public class GameController {
     }
 
     @SubscribeMapping("/state/{gameId}")
-    public String getGameState(@DestinationVariable String gameId, @Header("simpUser") Player player) {
-        return gameUpdateService.onSubscribed(gameId, player);
+    public GameDataDTO<?> getGameState(@DestinationVariable String gameId, @Header("simpUser") Player player) {
+        return gameUpdateService.onSubscribed(player, gameId);
     }
 
 }

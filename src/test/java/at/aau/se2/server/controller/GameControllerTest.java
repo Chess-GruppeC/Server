@@ -1,9 +1,11 @@
 package at.aau.se2.server.controller;
 
+import at.aau.se2.server.dto.GameDataDTO;
 import at.aau.se2.server.entity.Game;
 import at.aau.se2.server.entity.Player;
 import at.aau.se2.server.repository.GameRepository;
 import at.aau.se2.server.repository.GameRepositoryImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -38,6 +41,8 @@ class GameControllerTest extends AbstractControllerTest {
     private Game game;
     private Player player, player2;
 
+    private GameDataDTO<String> gameDataDTO;
+
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
@@ -48,12 +53,22 @@ class GameControllerTest extends AbstractControllerTest {
         game.join(player2);
         game.setPlayerOnTurn(player);
         repository.add(game);
+        gameDataDTO = new GameDataDTO<>();
+        gameDataDTO.setData("data");
     }
 
     @Test
     void verifyGameUpdateControllerIsCalled() throws Exception {
+        // Re initialize the session because a MappingJackson2MessageConverter is needed
+        WebSocketStompClient webSocketStompClient = new WebSocketStompClient(new SockJsClient(
+                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        session = webSocketStompClient
+                .connect(String.format(getWsPath(), port), new StompSessionHandlerAdapter() {
+                })
+                .get(1, TimeUnit.SECONDS);
 
-        session.send(getHeaders("/topic/game/" + game.getId()), "Data");
+        session.send(getHeaders("/topic/game/" + game.getId()), gameDataDTO);
         waiter.await(1, TimeUnit.SECONDS);  // wait one second
 
         // Test if the findById() method from the GameRepository is called with the correct game ID

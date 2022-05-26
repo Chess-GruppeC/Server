@@ -1,5 +1,6 @@
 package at.aau.se2.server.entity;
 
+import at.aau.se2.server.dto.GameDataDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class Game {
 
     private boolean hasEqualDiceValues = false;
 
-    private String gameState;
+    private GameDataDTO<?> gameState;
 
     public Game() {
         players = new ArrayList<>();
@@ -124,11 +125,11 @@ public class Game {
                 .distinct().count() == 1;
     }
 
-    public String getGameState() {
+    public GameDataDTO<?> getGameState() {
         return gameState;
     }
 
-    public void setGameState(String gameState) {
+    public void setGameState(GameDataDTO<?> gameState) {
         this.gameState = gameState;
     }
 
