@@ -1,5 +1,6 @@
 package at.aau.se2.server.entity;
 
+import at.aau.se2.server.dto.GameDataDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -68,8 +69,39 @@ class GameTest {
     void rejoinGameTest() {
         assertTrue(g1.join(p1));
         assertTrue(g1.join(p2));
+        p1.setSessionId("newSession");
         assertTrue(g1.join(p1));
         assertEquals(2, g1.getPlayers().size());
+    }
+
+    @Test
+    void playerOnTurnReconnectsTest() {
+        assertTrue(g1.join(p1));
+        assertTrue(g1.join(p2));
+        g1.addDice(p1, 4);
+        g1.addDice(p2, 5);
+        assertEquals(p2, g1.getPlayerOnTurn());
+
+        p2.setSessionId("otherId");
+        g1.join(p2);
+        assertEquals(2, g1.getPlayers().size());
+        assertEquals(p2, g1.getPlayerOnTurn());
+    }
+
+    @Test
+    void getOpponentCorrectTest() {
+        g1.join(p1);
+        g1.join(p2);
+        Player opponent = g1.getOpponentOf(p1);
+        assertEquals(p2, opponent);
+    }
+
+    @Test
+    void getOpponentFailTest() {
+        g1.join(p1);
+        Player opponent = g1.getOpponentOf(p1);
+        assertNotNull(opponent);
+        assertNull(opponent.getName());
     }
 
     @Test
@@ -129,6 +161,24 @@ class GameTest {
         assertNotNull(p1.getDiceValue());
         g1.resetDiceValues();
         assertNull(p1.getDiceValue());
+    }
+
+    @Test
+    void addDiceButWinnerAlreadyCalculatedTest() {
+        g1.join(p1);
+        g1.addDice(p1, 4);
+        g1.join(p2);
+        g1.addDice(p2, 5);
+        assertEquals(p2, g1.getDiceRollWinner());
+        g1.addDice(p1, 6);
+        assertEquals(p2, g1.getDiceRollWinner());
+    }
+
+    @Test
+    void gameStateTest() {
+        GameDataDTO<?> data = new GameDataDTO();
+        g1.setGameState(data);
+        assertEquals(data, g1.getGameState());
     }
 
 }

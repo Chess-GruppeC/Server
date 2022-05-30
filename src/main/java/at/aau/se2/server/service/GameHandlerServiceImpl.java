@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,16 +44,12 @@ public class GameHandlerServiceImpl implements GameHandlerService {
     }
 
     @Override
-    public Player getOpponentOf(Player requestingPlayer, String gameId) {
+    public PlayerDTO getOpponentOf(Player requestingPlayer, String gameId) {
         Game game = gameRepository.findById(gameId);
         if (game == null) {
-            return new Player(null);
+            return new PlayerDTO(null);
         }
-        Optional<Player> opponent = game
-                .getPlayers()
-                .stream()
-                .filter(Predicate.not(player -> Objects.equals(player, requestingPlayer))).findFirst();
-        return opponent.orElseGet(() -> new Player(null));
+        return playerMapper.map(game.getOpponentOf(requestingPlayer));
     }
 
     @Override
@@ -67,7 +60,7 @@ public class GameHandlerServiceImpl implements GameHandlerService {
             if(game.hasDiceRollWinner()) {
                 Player winner = game.getDiceRollWinner();
                 PlayerDTO winnerDTO  = playerMapper.map(winner);
-                PlayerDTO otherPlayerDTO  = playerMapper.map(getOpponentOf(winner, gameId));
+                PlayerDTO otherPlayerDTO  = playerMapper.map(game.getOpponentOf(winner));
                 return new DiceResultDTO(List.of(winnerDTO, otherPlayerDTO), winnerDTO);
             } else if(game.hasEqualDiceValues()) {
                 List<PlayerDTO> playerDTOS = game.getPlayers()

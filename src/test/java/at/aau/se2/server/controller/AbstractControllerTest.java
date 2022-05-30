@@ -1,6 +1,7 @@
 package at.aau.se2.server.controller;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.converter.StringMessageConverter;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AbstractControllerTest {
@@ -39,7 +42,12 @@ class AbstractControllerTest {
                 .get(1, TimeUnit.SECONDS);
 
         blockingQueue = new ArrayBlockingQueue<>(1);
+    }
 
+    @Test
+    void isSessionConnectedTest() {
+        assertNotNull(session);
+        assertTrue(session.isConnected());
     }
 
     protected String getWsPath() {

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
@@ -16,8 +15,6 @@ public class GameHandlerController {
     @Autowired
     private GameHandlerService gameHandlerService;
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     /**
      * Accepts user requests to create a new game

@@ -1,16 +1,17 @@
 package at.aau.se2.server.entity;
 
+import at.aau.se2.server.dto.GameDataDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Game {
 
     private String id;
     private final List<Player> players;
     private Player diceRollWinner;
-
-    private boolean hasEqualDiceValues = false;
+    private Player playerOnTurn;
 
     public static final int PLAYERS_REQUIRED = 2;
 
@@ -25,6 +26,10 @@ public class Game {
 
     // Base58 characters for human readability
     protected static final char[] ID_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
+
+    private boolean hasEqualDiceValues = false;
+
+    private GameDataDTO<?> gameState;
 
     public Game() {
         players = new ArrayList<>();
@@ -52,10 +57,16 @@ public class Game {
     }
 
     public boolean join(Player p) {
-        Optional<String> username = players.stream().map(Player::getName)
-                .filter(name -> name.equals(p.getName())).findFirst();
-        if (username.isPresent()) {
+        p.resetDiceValue();
+        Optional<Player> player = players.stream()
+                .filter(pl -> pl.getName().equals(p.getName())).findFirst();
+        if (player.isPresent()) {
             // player reconnected with new session id
+            if (player.get().equals(playerOnTurn)) {
+                playerOnTurn = p;
+            }
+            players.remove(player.get());
+            players.add(p);
             return true;
         }
 
@@ -68,7 +79,18 @@ public class Game {
         return false;
     }
 
+    public Player getOpponentOf(Player requestingPlayer) {
+        Optional<Player> opponent = players
+                .stream()
+                .filter(Predicate.not(player -> Objects.equals(player, requestingPlayer))).findFirst();
+        return opponent.orElseGet(() -> new Player(null));
+    }
+
     public void addDice(Player player, Integer value) {
+        if (hasDiceRollWinner()) {
+            return;
+        }
+
         players.stream()
                 .filter(p -> p.getName().equals(player.getName()) && p.getSessionId().equals(player.getSessionId()))
                 .findFirst()
@@ -83,9 +105,11 @@ public class Game {
             } else {
                 players.stream()
                         .max(Comparator.comparing(Player::getDiceValue))
-                        .ifPresent(p -> diceRollWinner = p);
+                        .ifPresent(p -> diceRollWinner = playerOnTurn = p);
                 hasEqualDiceValues = false;
             }
+        } else {
+            hasEqualDiceValues = false;
         }
     }
 
@@ -101,6 +125,14 @@ public class Game {
                 .distinct().count() == 1;
     }
 
+    public GameDataDTO<?> getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameDataDTO<?> gameState) {
+        this.gameState = gameState;
+    }
+
     public boolean hasEqualDiceValues() {
         return hasEqualDiceValues;
     }
@@ -111,5 +143,17 @@ public class Game {
 
     public Player getDiceRollWinner() {
         return diceRollWinner;
+    }
+
+    public Player getPlayerOnTurn() {
+        return playerOnTurn;
+    }
+
+    public void setPlayerOnTurn(Player newPlayerOnTurn) {
+        this.playerOnTurn = newPlayerOnTurn;
+    }
+
+    public void switchPlayerOnTurn() {
+        this.playerOnTurn = getOpponentOf(playerOnTurn);
     }
 }
