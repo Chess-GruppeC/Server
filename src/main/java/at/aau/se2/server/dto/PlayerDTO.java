@@ -5,7 +5,9 @@ public class PlayerDTO {
     private String name;
     private Integer diceValue;
 
-    public PlayerDTO() {}
+    public PlayerDTO() {
+        // Default constructor needed for Json conversion
+    }
 
     public PlayerDTO(String name) {
         this.name = name;

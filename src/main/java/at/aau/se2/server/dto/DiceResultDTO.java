@@ -10,7 +10,9 @@ public class DiceResultDTO {
     private List<PlayerDTO> players;
     private PlayerDTO winner;
 
-    public DiceResultDTO() {}
+    public DiceResultDTO() {
+        // Default constructor needed for Json conversion
+    }
 
     public DiceResultDTO(List<PlayerDTO> players) {
         this.players = players;

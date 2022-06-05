@@ -1,6 +1,7 @@
 package at.aau.se2.server.service;
 
 import at.aau.se2.server.dto.DiceResultDTO;
+import at.aau.se2.server.dto.GameDataDTO;
 import at.aau.se2.server.dto.PlayerDTO;
 import at.aau.se2.server.entity.Game;
 import at.aau.se2.server.entity.Player;
@@ -61,6 +62,9 @@ public class GameHandlerServiceImpl implements GameHandlerService {
                 Player winner = game.getDiceRollWinner();
                 PlayerDTO winnerDTO  = playerMapper.map(winner);
                 PlayerDTO otherPlayerDTO  = playerMapper.map(game.getOpponentOf(winner));
+                GameDataDTO<?> gameState = new GameDataDTO<>();
+                gameState.setNextPlayer(winnerDTO);
+                game.setGameState(gameState);
                 return new DiceResultDTO(List.of(winnerDTO, otherPlayerDTO), winnerDTO);
             } else if(game.hasEqualDiceValues()) {
                 List<PlayerDTO> playerDTOS = game.getPlayers()
