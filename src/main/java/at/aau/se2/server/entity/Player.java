@@ -47,4 +47,5 @@ public class Player implements Principal {
     public String getName() {
         return name;
     }
+
 }
